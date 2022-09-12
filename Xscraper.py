@@ -55,10 +55,11 @@ for agentID, bizID in zip(IDs, onlyX.keys()):
             "Registered Agent",
             "Owner Name",
             "Commercial Registered Agent",
+            "Owners",
         ]:
             onlyX[bizID]["AGENT"] = item["LABEL"]
             onlyX[bizID]["ID"] = item["VALUE"]
 
 onlyXList = list(onlyX.values())
 df = pd.DataFrame(onlyXList)
-print(df)
+df.to_csv("businesses.csv")
