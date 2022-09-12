@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
+import logging
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -16,6 +17,7 @@ Assumptions:
 
 Some trademarks have two owners, I only kept the first.
 I treat owners and registered agents as the same. I will be matching these to companies.
+
 """
 
 BIZ_JSON = {"SEARCH_VALUE": "X", "STARTS_WITH_YN": "false", "ACTIVE_ONLY_YN": "true"}
@@ -31,7 +33,6 @@ IDs = []
 for biz_id in a["rows"]:
     if a["rows"][biz_id]["TITLE"][0][0] in ["x", "X"]:
         onlyX[str(biz_id)] = {"TITLE": a["rows"][biz_id]["TITLE"][0].upper()}
-
 
 async def getBizAgent(session, url):
     async with session.get(url) as resp:
@@ -54,12 +55,9 @@ async def main():
                 IDs.append(agent)
 
         except aiohttp.ClientConnectionError:
-            # something went wrong with the exception, decide on what to do next
-            print("Oops, the connection was dropped before we finished")
+            logging.exception("The connection was dropped before we finished")
         except aiohttp.ClientError:
-            # something went wrong in general. Not a connection error, that was handled
-            # above.
-            print("Oops, something else went wrong with the request")
+            logging.exception("No connection error, something else went wrong.")
 
 
 asyncio.run(main())
