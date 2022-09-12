@@ -15,7 +15,7 @@ IDs = []
 
 for biz_id in a["rows"]:
     if a["rows"][biz_id]["TITLE"][0][0] in ["x", "X"]:
-        onlyX[str(biz_id)] = {"TITLE": a["rows"][biz_id]["TITLE"][0]}
+        onlyX[str(biz_id)] = {"TITLE": a["rows"][biz_id]["TITLE"][0].upper()}
 
 
 async def getBizAgent(session, url):
@@ -57,8 +57,8 @@ for agentID, bizID in zip(IDs, onlyX.keys()):
             "Commercial Registered Agent",
             "Owners",
         ]:
-            onlyX[bizID]["AGENT"] = item["LABEL"]
-            onlyX[bizID]["ID"] = item["VALUE"]
+            onlyX[bizID]["AGENT"] = item["LABEL"].upper()
+            onlyX[bizID]["ID"] = item["VALUE"].upper()
 
 onlyXList = list(onlyX.values())
 df = pd.DataFrame(onlyXList)
