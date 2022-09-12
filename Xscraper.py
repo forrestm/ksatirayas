@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
 
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+})
+
 """
 Assumptions:
 
@@ -83,5 +88,6 @@ nx.draw_networkx(g,
     pos = graphviz_layout(g), 
     node_size = 50,
     with_labels=False)
-plt.title("North Dakota X Businesses")
-plt.show()
+plt.title(r"North Dakota ``X'' Businesses", fontsize=30)
+# plt.show()
+plt.savefig("businesses.pdf")
