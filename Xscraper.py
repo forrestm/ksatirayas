@@ -3,22 +3,26 @@ import asyncio
 import requests
 import pandas as pd
 
-json = {"SEARCH_VALUE":"X","STARTS_WITH_YN":"false","ACTIVE_ONLY_YN":"true"}
+BIZ_JSON = {"SEARCH_VALUE": "X", "STARTS_WITH_YN": "false", "ACTIVE_ONLY_YN": "true"}
 
-resp = requests.post("https://firststop.sos.nd.gov/api/Records/businesssearch", json=json)
+BIZ_SEARCH_URL = "https://firststop.sos.nd.gov/api/Records/businesssearch"
+
+resp = requests.post(BIZ_SEARCH_URL, json=BIZ_JSON)
 a = resp.json()
 
 onlyX = {}
 IDs = []
 
 for biz_id in a["rows"]:
-    if a["rows"][biz_id]["TITLE"][0][0] in ['x', 'X']:
-        onlyX[str(biz_id)] = {'TITLE': a["rows"][biz_id]["TITLE"][0]}
+    if a["rows"][biz_id]["TITLE"][0][0] in ["x", "X"]:
+        onlyX[str(biz_id)] = {"TITLE": a["rows"][biz_id]["TITLE"][0]}
+
 
 async def getBizAgent(session, url):
     async with session.get(url) as resp:
         b = await resp.json()
         return b
+
 
 async def main():
 
@@ -42,13 +46,18 @@ async def main():
             # above.
             print("Oops, something else went wrong with the request")
 
+
 asyncio.run(main())
 
 for agentID, bizID in zip(IDs, onlyX.keys()):
-    for item in agentID['DRAWER_DETAIL_LIST']:
-        if item['LABEL'] in  ['Registered Agent', 'Owner Name', 'Commercial Registered Agent']:
-            onlyX[bizID]['AGENT'] = item['LABEL']
-            onlyX[bizID]['ID'] = item['VALUE']
+    for item in agentID["DRAWER_DETAIL_LIST"]:
+        if item["LABEL"] in [
+            "Registered Agent",
+            "Owner Name",
+            "Commercial Registered Agent",
+        ]:
+            onlyX[bizID]["AGENT"] = item["LABEL"]
+            onlyX[bizID]["ID"] = item["VALUE"]
 
 onlyXList = list(onlyX.values())
 df = pd.DataFrame(onlyXList)
