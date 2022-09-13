@@ -7,37 +7,51 @@ import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
 import logging
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-})
+## Uncomment for LaTeX printing
+# plt.rcParams.update(
+#     {
+#         "text.usetex": True,
+#         "font.family": "serif",
+#     }
+# )
 
 """
 Assumptions:
 
 Some trademarks have two owners, I only kept the first.
-I treat owners and registered agents as the same. I will be matching these to companies.
+
+I treat owners and registered agents as the same. 
+I will be matching these to companies.
+
+Requests was used for the inital request. 
+Since it is a single request requests is a less verbose choice.
+Aiohttp was used to grab the business detail information.
+This information is stored in a "drawer" element for each company.
+Requiring a request for each company.
 
 """
 
-BIZ_JSON = {"SEARCH_VALUE": "X", "STARTS_WITH_YN": "false", "ACTIVE_ONLY_YN": "true"}
-
 BIZ_SEARCH_URL = "https://firststop.sos.nd.gov/api/Records/businesssearch"
 
+BIZ_JSON = {"SEARCH_VALUE": "X", "STARTS_WITH_YN": "false", "ACTIVE_ONLY_YN": "true"}
+
 resp = requests.post(BIZ_SEARCH_URL, json=BIZ_JSON)
-a = resp.json()
+response_json = resp.json()
 
 onlyX = {}
 IDs = []
 
-for biz_id in a["rows"]:
-    if a["rows"][biz_id]["TITLE"][0][0] in ["x", "X"]:
-        onlyX[str(biz_id)] = {"TITLE": a["rows"][biz_id]["TITLE"][0].upper()}
+for biz_id in response_json["rows"]:
+    if response_json["rows"][biz_id]["TITLE"][0][0] in ["x", "X"]:
+        onlyX[str(biz_id)] = {
+            "TITLE": response_json["rows"][biz_id]["TITLE"][0].upper()
+        }
+
 
 async def getBizAgent(session, url):
     async with session.get(url) as resp:
-        b = await resp.json()
-        return b
+        bizAgentResponse = await resp.json()
+        return bizAgentResponse
 
 
 async def main():
@@ -75,17 +89,14 @@ for agentID, bizID in zip(IDs, onlyX.keys()):
 
 onlyXList = list(onlyX.values())
 df = pd.DataFrame(onlyXList)
-df.to_csv("businesses.csv")
-df = pd.read_csv("businesses.csv", index_col=0)
+# df.to_csv("businesses.csv")
+# df = pd.read_csv("businesses.csv", index_col=0)
 
-plt.figure(figsize=(12,12))
+plt.figure(figsize=(12, 12))
 
-g = nx.from_pandas_edgelist(df, source='ID', target='TITLE')
+g = nx.from_pandas_edgelist(df, source="ID", target="TITLE")
 
-nx.draw_networkx(g,
-    pos = graphviz_layout(g), 
-    node_size = 50,
-    with_labels=False)
+nx.draw_networkx(g, pos=graphviz_layout(g), node_size=50, with_labels=False)
 plt.title(r"North Dakota ``X'' Businesses", fontsize=30)
 # plt.show()
 plt.savefig("businesses.pdf")
