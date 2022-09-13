@@ -1,4 +1,4 @@
-## Sayari Data Task Submission.
+## Data Task.
 Assumptions:
 
 Some trademarks have two owners, I only kept the first.
