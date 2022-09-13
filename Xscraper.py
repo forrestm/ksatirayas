@@ -15,22 +15,6 @@ import logging
 #     }
 # )
 
-"""
-Assumptions:
-
-Some trademarks have two owners, I only kept the first.
-
-I treat owners and registered agents as the same. 
-I will be matching these to companies.
-
-Requests was used for the inital request. 
-Since it is a single request requests is a less verbose choice.
-Aiohttp was used to grab the business detail information.
-This information is stored in a "drawer" element for each company.
-Requiring a request for each company.
-
-"""
-
 BIZ_SEARCH_URL = "https://firststop.sos.nd.gov/api/Records/businesssearch"
 
 BIZ_JSON = {"SEARCH_VALUE": "X", "STARTS_WITH_YN": "false", "ACTIVE_ONLY_YN": "true"}
@@ -95,8 +79,8 @@ df = pd.DataFrame(onlyXList)
 plt.figure(figsize=(12, 12))
 
 g = nx.from_pandas_edgelist(df, source="ID", target="TITLE")
-
 nx.draw_networkx(g, pos=graphviz_layout(g), node_size=50, with_labels=False)
+
 plt.title(r"North Dakota ``X'' Businesses", fontsize=30)
 # plt.show()
 plt.savefig("businesses.pdf")
